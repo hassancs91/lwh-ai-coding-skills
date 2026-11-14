@@ -1,0 +1,10 @@
+{
+  "name": "lwh-ai-coding",
+  "description": "Plan an app, stress-test the plan, split it into tested tasks, and security-check the result, learning each building block along the way. Uses lwh-core to run the tasks.",
+  "author": {
+    "name": "Hasan Aboul Hasan"
+  },
+  "license": "MIT",
+  "dependencies": ["lwh-core"],
+  "keywords": ["planning", "beginners", "testing", "security"]
+}

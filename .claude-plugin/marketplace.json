@@ -1,0 +1,21 @@
+{
+  "name": "lwh",
+  "owner": {
+    "name": "Hasan Aboul Hasan"
+  },
+  "description": "Skills that help people plan, build and test real apps with Claude Code, learning as they go.",
+  "plugins": [
+    {
+      "name": "lwh-core",
+      "source": "./plugins/lwh-core",
+      "description": "Run any list of tasks to completion with a chain of worker subagents, and stop a run cleanly at any time.",
+      "category": "productivity"
+    },
+    {
+      "name": "lwh-ai-coding",
+      "source": "./plugins/lwh-ai-coding",
+      "description": "Plan an app, stress-test the plan, split it into tested tasks, and security-check the result. Installs lwh-core to run the tasks.",
+      "category": "development"
+    }
+  ]
+}
