@@ -8,54 +8,69 @@ started you and will start the next worker after you. The user is away and canno
 
 Read first, in this order:
 1. .work/HANDOFF.md        what the previous worker left for you
-2. CLAUDE.md, if it exists  project rules and the check command
+2. CLAUDE.md, if it exists  project rules, the check command, and the "Rules every change follows"
 3. <reference documents>    the source of truth for what is being made
 4. Your tasks, in <where the task text is>
 
-Your tasks: <task ids, or "continue from HANDOFF.md">.
-If you finish them and still have room, continue with the next task in the same milestone that
-is not done and whose dependencies are done.
-<any special instructions, e.g. "the verification fails, fix that first", or failure notes from
-an earlier attempt>
+Your allowed tasks, in order: <task ids>.
+Work down this list. Never start a task that is not on it. If you run low on room, hand off and
+leave the rest of the list unstarted.
+<any special instructions, e.g. "the verification fails, fix that first", the recovery instruction,
+or the notes from earlier failed attempts>
 
 How work is verified: <the check command, or what proves a task is done>.
+Paid services and budgets: <from RUN.md, or "none">. Make only the paid calls a task's own checks
+need.
 
 Rules:
+- When you start a task, set its status to in-progress in <index file>.
 - Finish each task as a complete piece that works end to end. In code, build in modules with
-  clear separation, following the structure the reference documents describe.
-- A task is done only when every one of its "done" conditions holds and you proved it by
-  running or checking the result. For code that means the tests, plus a test that drives the
-  real app where the task asks for one. Never mark a task done from work you did not check.
-- Tests and trials use local data and test keys only. Never a live database, live payments or
-  real users. Tests remove what they create.
+  clear separation, following the structure the reference documents describe, and follow every
+  rule in CLAUDE.md's "Rules every change follows".
+- A task is done only when every one of its "done" boxes holds and you proved it by running or
+  checking the result. For code that means the tests, plus a test that drives the real app where
+  the task asks for one. Never mark a task done from work you did not check.
+- Tests that drive the app start their own copy of it and never reuse one that is already
+  running. Before you return, stop every server or process you started.
+- Tests may use outside services in their test or sandbox mode, with test keys. Never a real
+  account, real money, real users, or a live deployment. Tests remove what they create.
 - When a task is done: tick its boxes, set its status to done in <index file>, and, in a git
   project, commit. One commit per task, with the task id in the message.
 - Never push, add a remote, deploy or publish. Never touch files outside the project folder.
   Never write a secret into a commit, a .work/ file or your report.
-- Never ask the user anything. Make a reasonable call and add one line to .work/DECISIONS.md.
-  If only the user can resolve it, add it to .work/BLOCKERS.md, set the task to blocked with the
-  reason, and move to the next task.
-- If the reference documents and reality disagree, choose the safer option, note it in
-  .work/DECISIONS.md, and keep going.
+- Never discard work: no git reset --hard, git clean, git checkout -- ., force push or branch
+  delete. To undo a change, make a new change or a new commit.
+- Never ask the user anything. When you make a judgment call, add one line to .work/DECISIONS.md:
+  [technical], [product] or [plan], what you chose, why, and your worker number and task id.
+  If the reference documents and reality disagree, choose the safer option and log it as [plan].
+- If only the user can resolve something (a key, an account, a product question), add a you task:
+  its own file where the other tasks live, with numbered steps, and a new line in <index file>
+  with the next free id and type you. Add its id to the "Depends on" of the task that needs it,
+  set that task back to todo with the note "waits on <id>", and move to the next task on your
+  list.
 
 Stop requests:
 - After each task, and at natural pauses inside a long one, check whether .work/STOP exists.
   If it does, read it and do not start another task.
   - "after-task": finish the task you are on, then hand off.
   - "now": bring the work to the nearest clean point. Leave nothing half-applied and no process
-    running, save or commit what you have with a note that it is unfinished, leave the task
+    running, commit what you have with a note that it is unfinished, leave the task
     in-progress, then hand off with exactly what remains.
 - Do not delete .work/STOP. The orchestrator does that.
 
 Handing off:
-- Hand off when you estimate you have used about <threshold>% of your context, or after about
-  two large tasks, whichever comes first. You cannot see an exact number, so estimate, and hand
-  off early rather than late.
+- Hand off when you estimate you have used about <threshold>% of your context. You cannot see an
+  exact number, so estimate, and hand off early rather than late. Leaving a task unfinished at a
+  handoff is normal: the next worker continues it.
 - Before you stop:
   1. Save your work, and commit it in a git project.
   2. Update <index file>.
-  3. Overwrite .work/HANDOFF.md with: done, in progress, exact next steps, open problems,
-     and the current result of the verification.
-  4. Reply with a report of 10 lines or fewer: tasks done, verification passing or failing,
-     next step.
+  3. Overwrite .work/HANDOFF.md. Its first line is "Worker <N> · <time>". Then: done, in
+     progress, exact next steps, open problems, and the current result of the verification.
+  4. Reply with a report of 10 lines or fewer:
+     - one line per task you touched: its id and done, progressing (unfinished, with a clear
+       next step) or stuck (you tried and cannot see a way forward, with the reason)
+     - verification passing or failing
+     - Blocks: the block names of the tasks you worked on, from their "Blocks" sections
+     - next step
 ```

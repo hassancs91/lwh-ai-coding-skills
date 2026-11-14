@@ -8,17 +8,24 @@ disable-model-invocation: true
 
 Find what is wrong with `docs/plan.md` while it is still cheap to fix, and fix it. A hole found here costs a few minutes. The same hole found after the build costs days.
 
+The project folder is `${CLAUDE_PROJECT_DIR}`. Read and write only inside it.
+
 Read `${CLAUDE_PLUGIN_ROOT}/house-style.md` first and follow it in every message.
 
 ## Start fresh
 
-You should judge the plan as written, the way a builder who was never in the planning conversation would read it. If this session is the one that wrote the plan, tell the user to run this in a new session, and continue here only if they prefer to.
+You should judge the plan as written, the way a builder who was never in the planning conversation would read it. If this conversation is the one that wrote the plan, tell the user to run `/clear` and then `/lwh-challenge-plan`, and continue here only if they prefer to.
 
 Read `docs/plan.md` and `${CLAUDE_PLUGIN_ROOT}/blocks/index.md`. If there is no plan, say so, name `/lwh-plan-app`, and stop.
 
+## What to review
+
+- **If "Changed since the last challenge" lists changes,** review only those changes, plus any part of the plan they touch. Say so to the user in one line.
+- **Otherwise,** review the whole plan.
+
 ## Find the weak spots first
 
-Before asking anything, go through the plan and list every problem you can find. Look for:
+Before asking anything, go through what you are reviewing and list every problem you can find. Look for:
 
 - **Unclear.** A place where two builders would build two different things.
 - **Unhappy paths.** What happens when something goes wrong: wrong input, an empty list, no connection, a forgotten password, a failed payment, a file that is too big.
@@ -27,14 +34,14 @@ Before asking anything, go through the plan and list every problem you can find.
 - **Too much.** The first version is too big, or the plan builds `go-live`, `with-users` or `at-scale` blocks now. Move them to the lists for later.
 - **Contradictions.** Two parts of the plan that cannot both be true.
 - **Cannot be checked.** A feature described so loosely that no test could tell whether it works.
-- **Missing human steps.** An account, key or purchase the build will need that is not under "Things only you can do".
+- **Missing human steps.** An account, key or purchase the build will need that is not under "Things only you can do". A paid service needs a spending limit set by the user.
 
 ## Then sort them
 
 - **Fix it yourself** only when there is one sensible answer and no real choice: a contradiction with an obvious resolution, or a missing piece the plan clearly implies. Record the fix in "Challenge notes" so the user sees it.
 - **Ask the user** about everything that involves a real choice, whether it is about the product or the technology. Explain what is at stake, recommend, and let them choose.
 
-There is no fixed number of questions. Work through every weak spot, most serious first. If the user wants to move faster, they can tell you to decide the rest. Then decide, and list what you decided.
+There is no fixed number of questions. Work through every weak spot, most serious first. If the user says "decide the rest", decide, and list what you decided.
 
 ## Ask as small stories
 
@@ -50,8 +57,9 @@ Be direct about scope. If the first version is too big, say so and propose what 
 
 Rewrite the affected sections of `docs/plan.md` so the plan reads as one clean document, not a plan with patches on top. Then:
 
-- Fill "Challenge notes" with what changed and why, one line each, including the fixes you made yourself.
-- Make sure "Open questions" is empty.
+- Add to "Challenge notes" what changed and why, one line each, including the fixes you made yourself. Keep the notes from earlier challenges.
+- Empty "Changed since the last challenge".
+- Go through "Open questions" with the user. Each one is answered and written into the plan, or moved to "Not yet" with the user's yes. Never delete a question just to empty the list.
 - Set the status to `challenged`.
 
 ## Finish

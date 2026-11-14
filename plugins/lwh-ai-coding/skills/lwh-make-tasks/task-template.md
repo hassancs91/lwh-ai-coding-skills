@@ -1,18 +1,22 @@
 # Task formats and rules
 
+Keep every heading, column, id, type and status exactly as written here, in English, whatever language the content is in. `/lwh-run` and the other skills read them.
+
 ## The index: `docs/tasks/index.md`
 
 One line per task. Status lives only here.
 
 ```markdown
-| ID  | Title                  | Milestone | Type  | Depends on | Status |
-|-----|------------------------|-----------|-------|------------|--------|
-| T00 | Set up the project     | M0        | build | none       | todo   |
-| T01 | Visitors can sign up   | M1        | build | T00        | todo   |
+| ID  | Title                  | Milestone | Type   | Depends on | Status | Note |
+|-----|------------------------|-----------|--------|------------|--------|------|
+| T00 | Set up the project     | M0        | build  | none       | todo   |      |
+| T01 | Visitors can sign up   | M1        | build  | T00        | todo   |      |
+| T02 | Review milestone 1     | M1        | review | T01        | todo   |      |
 ```
 
 - **Type:** `build`, `you`, `review` or `security`.
-- **Status:** `todo`, `in-progress`, `done` or `blocked`.
+- **Status:** `todo`, `in-progress`, `done`, `blocked` or `skipped`. `skipped` is only for a `you` task the user chose not to do yet.
+- **Note:** a short reason for `blocked` or `skipped`, or what the task waits on. Empty otherwise.
 - Ids never change once written. New tasks take the next free number.
 
 Above the table, list the milestones with one line each: what the user can try when it is finished.
@@ -41,7 +45,7 @@ Account recovery, Brute force
 - By hand at the milestone: anything only a person can judge
 
 ## Needs from you
-None, or the exact item the user must provide.
+None, or the id of the `you` task it depends on.
 ```
 
 Rules for writing a task:
@@ -50,22 +54,32 @@ Rules for writing a task:
 - Every "Done when" box must be something a test can prove. "Works well" is not a check. "A wrong password shows an error and does not log in" is.
 - Cover the unhappy path in the boxes, not only the case where everything goes right.
 - A box that comes from a block starts with the block's name in brackets.
+- Only blocks with proof `test` become boxes here. Blocks with proof `review` go into the milestone's review task, and cross-cutting blocks into `CLAUDE.md`.
 
 ## T00: set up the project
 
-T00 always has these boxes, whatever the stack. Add stack-specific ones if the plan needs them.
+T00's boxes are the "Done when" checks of every block with scope `setup` that applies to this app, copied as they are, each with the block's name in brackets. Add stack-specific boxes if the plan needs them.
+
+### T00 for an existing app
+
+When the app already exists, T00 only puts a safety net in place. It does not restructure old code.
+
+- Keep the `setup` boxes for git, secrets, env vars and `CLAUDE.md`.
+- Instead of the full browser-test box, use: "(Playwright) One smoke test starts the app and loads its main page, and the check command runs it." For an app without screens, the smoke test starts it and makes one real request.
+- The check command wraps the tests the project already has, plus that smoke test.
+- "Code organisation" rules apply to new code only.
+- Propose any cleanup of old code as separate tasks that the user chooses. No feature task depends on them.
+
+## `CLAUDE.md`: Rules every change follows
 
 ```markdown
-## Done when
-- [ ] Git is set up, with a .gitignore that covers secrets, dependencies and .work/
-- [ ] Secrets are read from the environment, with an example file that holds no real values
-- [ ] Code is organised in modules with clear separation, as the plan describes
-- [ ] One check command runs lint, types and all tests, and it passes
-- [ ] One code test and one test that drives the real app both pass
-- [ ] CLAUDE.md names the check command and links to docs/plan.md
+## Rules every change follows
+- (Authorization) Every action checks on the server that this user may do it. Hiding a button does not count as the check.
+- (Input validation) Every input is checked on the server for type, size and allowed values. Bad input gets a clear error and is never saved.
+- ...
 ```
 
-If the project already exists, T00 fills in only what is missing from this list.
+One line per cross-cutting block that applies to this app, copied from its "Done when". Keep the section short; it is read at the start of every worker.
 
 ## A `you` task
 
@@ -81,19 +95,22 @@ Numbered steps a beginner can follow, one action per step.
 Exactly what is needed and where it goes, for example which key into which line of the env file. Never paste a secret into a task file or a chat message.
 ```
 
+For a paid service, add a step: "Set a spending limit of the amount you chose in the provider's dashboard."
+
 ## A `review` task
 
 ```markdown
-# T12: Review logins and private data
+# T12: Review milestone 2
 
 Milestone: M2 · Type: review · Depends on: T08, T09, T10, T11
 
 ## What to review
-The area, and what to try to break.
+The area, what to try to break, and the plan sections it must match.
 
 ## Blocks to check
-- <Block name>: <its check, copied from the blocks index>
+- [ ] (<Block name>) <its check, copied from the part file>
 - ...
+- [ ] Every rule in CLAUDE.md's "Rules every change follows" holds for this milestone's work
 ```
 
 The reviewer writes each finding as a failing test and a new task. It does not fix anything itself.
