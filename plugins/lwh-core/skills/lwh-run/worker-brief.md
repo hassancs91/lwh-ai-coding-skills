@@ -41,8 +41,14 @@ Rules:
 - Never discard work: no git reset --hard, git clean, git checkout -- ., force push or branch
   delete. To undo a change, make a new change or a new commit.
 - Never ask the user anything. When you make a judgment call, add one line to .work/DECISIONS.md:
-  [technical], [product] or [plan], what you chose, why, and your worker number and task id.
-  If the reference documents and reality disagree, choose the safer option and log it as [plan].
+  a tag, what you chose, why, and your worker number and task id. The tag is:
+  - [product]: the user would notice it. It changes what they see or can do, costs money, adds a
+    service or an account, or sets a limit they can hit.
+  - [plan]: the reference documents and reality disagree. Choose the safer option.
+  - [technical]: how the code is built, with nothing the user would notice. If the choice carries
+    a risk, such as relying on something that may break later, say so in the line.
+  Log choices only. A problem you found or a task you added goes in your report and the handoff,
+  not in DECISIONS.md.
 - If only the user can resolve something (a key, an account, a product question), add a you task:
   its own file where the other tasks live, with numbered steps, and a new line in <index file>
   with the next free id and type you. Add its id to the "Depends on" of the task that needs it,

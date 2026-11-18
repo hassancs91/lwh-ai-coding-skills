@@ -592,8 +592,9 @@
           "applies": "every app",
           "stage": "day-one",
           "kind": "checkable",
-          "proof": "scan",
-          "check": "A scan of the project's packages reports no known serious problems."
+          "scope": "setup",
+          "proof": "test",
+          "check": "The check command scans the project's packages for known security problems, and fails when it finds a serious one."
         },
         {
           "name": "Secret scanning",
@@ -601,8 +602,9 @@
           "applies": "every app",
           "stage": "day-one",
           "kind": "checkable",
-          "proof": "scan",
-          "check": "A secret scan over the code and the full git history finds nothing."
+          "scope": "setup",
+          "proof": "test",
+          "check": "The check command scans the tracked files and the git history for keys and passwords, and fails when it finds one."
         },
         {
           "name": "Data retention",

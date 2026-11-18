@@ -27,9 +27,11 @@ How to work:
 - In code, write every finding as a test that fails for the right reason. Mark it as an
   expected failure so the check command still passes until the fix lands.
 - Turn each finding into a task: its full text where the other tasks live, and a new line in
-  <index file> with the next free id, in the current milestone, status todo. Say how serious it
+  <index file> with the next free id, type fix, in the current milestone, status todo. Say how serious it
   is and what a fix must achieve. The last box of every fix task is: "The expected-failure mark
   on <test name> is removed, and the test passes." Do not fix anything yourself.
+- If your task has its own section on what to do with a finding, follow that section instead
+  of the two points above. You still fix nothing yourself.
 - Never push, deploy, or touch files outside the project folder. Never discard work (no git
   reset --hard, git clean or git checkout -- .). Never write a secret into a commit, a task or
   your report.

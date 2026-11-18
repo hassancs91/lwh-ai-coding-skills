@@ -14,7 +14,7 @@ One line per task. Status lives only here.
 | T02 | Review milestone 1     | M1        | review | T01        | todo   |      |
 ```
 
-- **Type:** `build`, `you`, `review` or `security`.
+- **Type:** `build`, `you`, `review`, `security` or `fix`. A `fix` task is created for a finding, by a review task or by `/lwh-security-check`. `/lwh-make-tasks` never writes one.
 - **Status:** `todo`, `in-progress`, `done`, `blocked` or `skipped`. `skipped` is only for a `you` task the user chose not to do yet.
 - **Note:** a short reason for `blocked` or `skipped`, or what the task waits on. Empty otherwise.
 - Ids never change once written. New tasks take the next free number.
@@ -41,8 +41,11 @@ Account recovery, Brute force
 
 ## How to test
 - Code tests: what to cover
-- App test: the steps to drive in the real app (for a web app, in a browser at desktop and phone width)
+- App test: the steps to drive in the real app (for a web app, in a browser at every width the plan needs)
 - By hand at the milestone: anything only a person can judge
+
+## Design
+Only when `docs/design.md` exists and the task builds a screen. The mockup file, for example `docs/design/screens/reset-password.html`, and the shared components this task builds or reuses. For a screen with no mockup of its own: the mockup it follows, and the shared components to build it from.
 
 ## Needs from you
 None, or the id of the `you` task it depends on.
@@ -55,16 +58,24 @@ Rules for writing a task:
 - Cover the unhappy path in the boxes, not only the case where everything goes right.
 - A box that comes from a block starts with the block's name in brackets.
 - Only blocks with proof `test` become boxes here. Blocks with proof `review` go into the milestone's review task, and cross-cutting blocks into `CLAUDE.md`.
+- A task with a "Design" section starts from its mockup: the worker reuses the mockup's markup and styles, with real data in place of the example content. The mockup is a starting point, not a picture to match exactly. Where the mockup and `docs/design.md` disagree, `docs/design.md` wins.
 
 ## T00: set up the project
 
 T00's boxes are the "Done when" checks of every block with scope `setup` that applies to this app, copied as they are, each with the block's name in brackets. Add stack-specific boxes if the plan needs them.
 
+Two of those boxes put scans into the check command from the first commit: Dependency scanning and Secret scanning. Say this under "How to test":
+
+- Each scanning tool is installed inside the project, for example as a dev dependency, or run through the package manager. If the only way is a global install, add a `you` task with the exact command, and make T00 depend on it.
+- The secret scan never reads or prints the real env file.
+- A finding that cannot be fixed in the project, such as a problem deep in a dev tool, is listed in `CLAUDE.md` with its reason and ignored by name, so the check still passes. Nothing else is ignored.
+
 ### T00 for an existing app
 
 When the app already exists, T00 only puts a safety net in place. It does not restructure old code.
 
-- Keep the `setup` boxes for git, secrets, env vars and `CLAUDE.md`.
+- Keep the `setup` boxes for git, secrets, env vars, `CLAUDE.md` and the two scans.
+- What the scans find in the old code or its history does not block T00. Each finding becomes its own task, and a key found in the history becomes a `you` task to replace that key. Until those are done, the findings are listed in `CLAUDE.md` and ignored by name.
 - Instead of the full browser-test box, use: "(Playwright) One smoke test starts the app and loads its main page, and the check command runs it." For an app without screens, the smoke test starts it and makes one real request.
 - The check command wraps the tests the project already has, plus that smoke test.
 - "Code organisation" rules apply to new code only.
@@ -80,6 +91,12 @@ When the app already exists, T00 only puts a safety net in place. It does not re
 ```
 
 One line per cross-cutting block that applies to this app, copied from its "Done when". Keep the section short; it is read at the start of every worker.
+
+When `docs/design.md` exists, add this line, and a link to `docs/design.md` next to the link to the plan:
+
+```markdown
+- (Design) Every screen uses the colours, type, spacing and shared components described in docs/design.md. No one-off values. A piece that a second screen needs becomes a shared component.
+```
 
 ## A `you` task
 
@@ -111,6 +128,9 @@ The area, what to try to break, and the plan sections it must match.
 - [ ] (<Block name>) <its check, copied from the part file>
 - ...
 - [ ] Every rule in CLAUDE.md's "Rules every change follows" holds for this milestone's work
+- [ ] (Screens) Each screen this milestone built was opened in a real browser at every width the plan needs: phone, desktop or both. Nothing overflows, overlaps or is cut off, the text is readable, it is clear what to do next, and its empty, loading and error states show.
 ```
 
-The reviewer writes each finding as a failing test and a new task. It does not fix anything itself.
+Leave out the "Screens" box for an app without screens. It is about the screens that were really built: the reviewer looks at them as a person would, and does not compare them with the mockups.
+
+The reviewer writes each finding as a failing test and a new task. It does not fix anything itself. A finding that only a person can see, such as two things that look misaligned, becomes a task with a clear description and a screenshot path in place of a failing test.

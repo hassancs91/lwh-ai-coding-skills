@@ -45,7 +45,7 @@ Code organisation: one line on how the code is split, for example "screens, busi
 **Later, when the app has users:** a short list of block names.
 
 ## Technical decisions
-- <choice>: <one-line reason> (chosen by the user / left to Claude / left to Claude, during the build)
+- <choice>: <one-line reason> (chosen by the user / left to Claude / left to Claude, during the design / left to Claude, while writing the tasks / left to Claude, during the build)
 
 ## Things only you can do
 - <account to open, key to get, purchase to make>, and what exactly is needed from it

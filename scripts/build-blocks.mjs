@@ -1,10 +1,12 @@
-// Builds the blocks index that ships in the plugin.
+// Builds the blocks index into every skill that reads it.
 //
-//   node scripts/build-blocks.mjs                       write plugins/lwh-ai-coding/blocks/
-//   node scripts/build-blocks.mjs --check               exit 1 if blocks/ is out of date
+//   node scripts/build-blocks.mjs                       write blocks/ into each skill in BLOCK_SKILLS
+//   node scripts/build-blocks.mjs --check               exit 1 if any copy is out of date
 //   node scripts/build-blocks.mjs --from-book <book>    compare blocks-meta.json with the book, change nothing
 //
 // scripts/blocks-meta.json is the only source. It is written by hand, and anyone can edit it.
+// Each skill gets its own copy, because a skill installed on its own (for example with
+// `npx skills add`) can read only its own folder.
 // The book comparison is an optional step for the maintainer: it reports blocks that are in the
 // book but not in blocks-meta.json, the other way round, and parts that differ.
 
@@ -13,7 +15,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const outDir = join(root, 'plugins', 'lwh-ai-coding', 'blocks');
+const skillsDir = join(root, 'plugins', 'lwh-ai-coding', 'skills');
+const BLOCK_SKILLS = ['lwh-plan-app', 'lwh-challenge-plan', 'lwh-make-tasks', 'lwh-security-check'];
+const outDirs = BLOCK_SKILLS.map((s) => join(skillsDir, s, 'blocks'));
 const metaPath = join(root, 'scripts', 'blocks-meta.json');
 
 const args = process.argv.slice(2);
@@ -23,7 +27,7 @@ const meta = JSON.parse(readFileSync(metaPath, 'utf8'));
 
 const STAGES = ['day-one', 'day-one-if', 'go-live', 'with-users', 'at-scale', 'any'];
 const KINDS = ['checkable', 'practice', 'concept'];
-const PROOFS = ['test', 'review', 'scan'];
+const PROOFS = ['test', 'review'];
 const SCOPES = ['feature', 'cross-cutting', 'setup'];
 const errors = [];
 const seen = new Set();
@@ -106,9 +110,9 @@ const index = [
   '- `at-scale`: with real traffic.',
   '- `any`: a concept, explained when the term comes up.',
   '',
-  '**Kind:** `checkable` (a test, a scan or a reviewer can prove it), `practice` (a way of working; no box in any task), `concept` (something to understand; never put in a plan or turned into a check).',
+  '**Kind:** `checkable` (a test or a reviewer can prove it), `practice` (a way of working; no box in any task), `concept` (something to understand; never put in a plan or turned into a check).',
   '',
-  '**Proof:** how a check is proven. `test` goes into a build task and is proven by running a test. `review` goes into the milestone\'s review task and is judged by a fresh reviewer, never by the worker who built it. `scan` is run by `/lwh-security-check`.',
+  '**Proof:** how a check is proven. `test` goes into a build task and is proven by running a test. `review` goes into the milestone\'s review task and is judged by a fresh reviewer, never by the worker who built it.',
   '',
   '**Scope:** `setup` blocks are the boxes of T00, the task that sets the project up. `cross-cutting` blocks apply to every change: they go into the "Rules every change follows" list in the project\'s `CLAUDE.md`, not into single tasks, and each milestone review checks them. Blank means the block belongs to the tasks that build its feature.',
   '',
@@ -135,18 +139,24 @@ files.set('index.md', index.join('\n'));
 
 if (args.includes('--check')) {
   const norm = (s) => s.replace(/\r\n/g, '\n');
-  const existing = existsSync(outDir) ? readdirSync(outDir) : [];
-  const stale = [...files].filter(([f, c]) => !existsSync(join(outDir, f)) || norm(readFileSync(join(outDir, f), 'utf8')) !== norm(c)).map(([f]) => f);
-  const extra = existing.filter((f) => !files.has(f));
-  if (stale.length || extra.length) {
-    console.log(`Out of date: ${[...stale, ...extra.map((f) => `${f} (should not exist)`)].join(', ')}`);
-    process.exit(1);
+  let bad = false;
+  for (const [i, outDir] of outDirs.entries()) {
+    const existing = existsSync(outDir) ? readdirSync(outDir) : [];
+    const stale = [...files].filter(([f, c]) => !existsSync(join(outDir, f)) || norm(readFileSync(join(outDir, f), 'utf8')) !== norm(c)).map(([f]) => f);
+    const extra = existing.filter((f) => !files.has(f));
+    if (stale.length || extra.length) {
+      bad = true;
+      console.log(`Out of date in ${BLOCK_SKILLS[i]}/blocks: ${[...stale, ...extra.map((f) => `${f} (should not exist)`)].join(', ')}`);
+    }
   }
-  console.log('blocks/ is up to date.');
+  if (bad) process.exit(1);
+  console.log(`blocks/ is up to date in ${BLOCK_SKILLS.length} skills.`);
   process.exit(0);
 }
 
-rmSync(outDir, { recursive: true, force: true });
-mkdirSync(outDir, { recursive: true });
-for (const [f, c] of files) writeFileSync(join(outDir, f), c);
-console.log(`Wrote ${count} blocks in ${meta.parts.length} parts to plugins/lwh-ai-coding/blocks/`);
+for (const outDir of outDirs) {
+  rmSync(outDir, { recursive: true, force: true });
+  mkdirSync(outDir, { recursive: true });
+  for (const [f, c] of files) writeFileSync(join(outDir, f), c);
+}
+console.log(`Wrote ${count} blocks in ${meta.parts.length} parts to the blocks/ folder of ${BLOCK_SKILLS.join(', ')}`);

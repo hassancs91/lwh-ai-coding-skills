@@ -11,7 +11,7 @@ The user wants a running `/lwh-run` to stop. Your job is to request a clean stop
 
 The project folder is `${CLAUDE_PROJECT_DIR}`. Look for the run only there, never in another folder this session can see.
 
-Read `${CLAUDE_PLUGIN_ROOT}/house-style.md` first and follow it.
+Read `${CLAUDE_SKILL_DIR}/house-style.md` first and follow it.
 
 ## 1. Check there is a run
 

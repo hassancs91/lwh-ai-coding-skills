@@ -25,16 +25,18 @@
 - Applies when: every app.
 - Stage: day-one
 - Kind: checkable
-- Proof: scan
-- Done when: A scan of the project's packages reports no known serious problems.
+- Scope: setup
+- Proof: test
+- Done when: The check command scans the project's packages for known security problems, and fails when it finds a serious one.
 
 ### Secret scanning
 - What: Search the code and its history for keys or passwords that were committed by mistake.
 - Applies when: every app.
 - Stage: day-one
 - Kind: checkable
-- Proof: scan
-- Done when: A secret scan over the code and the full git history finds nothing.
+- Scope: setup
+- Proof: test
+- Done when: The check command scans the tracked files and the git history for keys and passwords, and fails when it finds one.
 
 ### Data retention
 - What: Decide how long personal data is kept, and delete it when the time is up.

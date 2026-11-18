@@ -12,9 +12,9 @@ Every block, with when it applies and when it starts to matter. Pick blocks from
 - `at-scale`: with real traffic.
 - `any`: a concept, explained when the term comes up.
 
-**Kind:** `checkable` (a test, a scan or a reviewer can prove it), `practice` (a way of working; no box in any task), `concept` (something to understand; never put in a plan or turned into a check).
+**Kind:** `checkable` (a test or a reviewer can prove it), `practice` (a way of working; no box in any task), `concept` (something to understand; never put in a plan or turned into a check).
 
-**Proof:** how a check is proven. `test` goes into a build task and is proven by running a test. `review` goes into the milestone's review task and is judged by a fresh reviewer, never by the worker who built it. `scan` is run by `/lwh-security-check`.
+**Proof:** how a check is proven. `test` goes into a build task and is proven by running a test. `review` goes into the milestone's review task and is judged by a fresh reviewer, never by the worker who built it.
 
 **Scope:** `setup` blocks are the boxes of T00, the task that sets the project up. `cross-cutting` blocks apply to every change: they go into the "Rules every change follows" list in the project's `CLAUDE.md`, not into single tasks, and each milestone review checks them. Blank means the block belongs to the tasks that build its feature.
 
@@ -170,8 +170,8 @@ File: `security-abuse-and-privacy.md`
 | Signed device ID | the app must recognise visitors who have no account | with-users | checkable |  |  |
 | Honeypot | the app is live and being probed | with-users | checkable |  |  |
 | Audit trail | staff change other people's data, or money moves | with-users | checkable |  |  |
-| Dependency scanning | every app | day-one | checkable | scan |  |
-| Secret scanning | every app | day-one | checkable | scan |  |
+| Dependency scanning | every app | day-one | checkable | test | setup |
+| Secret scanning | every app | day-one | checkable | test | setup |
 | Data retention | the app keeps personal data over time | with-users | checkable |  |  |
 | Consent management | the app tracks visitors where consent is required | go-live | checkable |  |  |
 
